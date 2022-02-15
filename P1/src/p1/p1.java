@@ -71,7 +71,23 @@ public class p1 {
 			System.out.println();
 			coordinateBased(scanner);
 			
+			
+			System.out.println("hi");
 			//solution for coord based
+			for (int i = 0; i < rows; i++) {
+				for (int j = 0; j < cols; j++) {
+					if (map1Coords[i][j].equals(".")) {
+						map1Coords[i][j] = "1";
+					}
+				}
+			}
+			
+			for (int i = 0; i < rows; i++) {
+				System.out.println();
+				for (int j = 0; j < cols; j++) {
+					System.out.print(map1Coords[i][j]);
+				}
+			}
 		}
 		
 	}
@@ -102,6 +118,8 @@ public class p1 {
 					System.out.print(map1Coords[i][j]);
 				}
 			}
+			
+			System.out.println();
 			
 		} catch(Exception e) {
 			System.out.println(e);
