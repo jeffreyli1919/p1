@@ -1,6 +1,8 @@
 package p1;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Scanner;
 
 public class p1 {
@@ -70,24 +72,10 @@ public class p1 {
 			//System.out.println(e);
 			System.out.println();
 			coordinateBased(scanner);
+			queueSolution(scanner);
 			
 			
-			System.out.println("hi");
-			//solution for coord based
-			for (int i = 0; i < rows; i++) {
-				for (int j = 0; j < cols; j++) {
-					if (map1Coords[i][j].equals(".")) {
-						map1Coords[i][j] = "1";
-					}
-				}
-			}
 			
-			for (int i = 0; i < rows; i++) {
-				System.out.println();
-				for (int j = 0; j < cols; j++) {
-					System.out.print(map1Coords[i][j]);
-				}
-			}
 		}
 		
 	}
@@ -126,6 +114,92 @@ public class p1 {
 			System.out.println("exception catch fail");
 		}
 		
+	}
+	
+	public static void queueSolution(Scanner scan) {
+		try {
+			//solution for coord based
+			//finding kirby and possible spaces for kirby
+			
+			
+			long start = System.currentTimeMillis();
+			
+			Queue<Integer> queue = new LinkedList<>();
+			for (int i = 0; i < rows; i++) {
+				for (int j = 0; j < cols; j++) {
+					if (map1Coords[i][j].equals(".")) {
+						map1Coords[i][j] = "1";
+					} else if (map1Coords[i][j].equals("K")) {
+						queue.add(i);
+						queue.add(j);
+					} 
+				}
+			}
+			
+			for (int i = 0; i < rows; i++) {
+				System.out.println();
+				for (int j = 0; j < cols; j++) {
+					System.out.print(map1Coords[i][j]);
+				}
+			}
+			
+			while (queue.size() > 0) {
+				int curY = queue.remove(); //3
+				int curX = queue.remove(); //0
+				System.out.println(curX + " " + curY);
+				//System.out.println();
+				//System.out.println(curX);
+				//System.out.println(curY);
+				//System.out.println(rows);
+				//System.out.println(cols);
+				
+				map1Coords[curX][curY] = "-1";
+				
+				if (map1Coords[curX][curY].equals("C")) {
+					System.out.print("found");
+				}
+				
+				if (curY > 0) {
+					if (map1Coords[curY-1][curX].equals("1")) {
+						queue.add(curX);
+						queue.add(curY-1);
+					}
+				}
+				if (curY < cols-1) {
+					if (map1Coords[curY+1][curX].equals("1")) {
+						queue.add(curX);
+						queue.add(curY+1);
+					}
+				}
+				
+				if (curX < rows-1) {
+					//rows are y cols are x
+					if (map1Coords[curY][curX+1].equals("1")) {
+						queue.add(curX+1);
+						queue.add(curY);
+						//System.out.println("added");
+					}
+				}
+				
+				if (curX > 0) {
+					if (map1Coords[curY][curX-1].equals("1")) {
+						queue.add(curX-1);
+						queue.add(curY);
+					}
+				}
+				
+				//System.out.println("end");
+				System.out.println(queue.size());
+			}
+			
+			System.out.println();
+			System.out.println("runtime: " + (System.currentTimeMillis()-start));
+			
+			
+		} catch(Exception e) {
+			System.out.println();
+			System.out.println(e);
+		}
 	}
 }
 
