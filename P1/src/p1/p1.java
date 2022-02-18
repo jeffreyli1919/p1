@@ -153,38 +153,40 @@ public class p1 {
 				//System.out.println(rows);
 				//System.out.println(cols);
 				
-				map1Coords[curX][curY] = "-1";
+			
 				
 				if (map1Coords[curX][curY].equals("C")) {
 					System.out.print("found");
 				}
 				
+				map1Coords[curX][curY] = "-1";
+				
 				if (curY > 0) {
 					if (map1Coords[curY-1][curX].equals("1")) {
-						queue.add(curX);
 						queue.add(curY-1);
+						queue.add(curX);
 					}
 				}
 				if (curY < cols-1) {
 					if (map1Coords[curY+1][curX].equals("1")) {
-						queue.add(curX);
 						queue.add(curY+1);
+						queue.add(curX);
 					}
 				}
 				
 				if (curX < rows-1) {
 					//rows are y cols are x
 					if (map1Coords[curY][curX+1].equals("1")) {
-						queue.add(curX+1);
 						queue.add(curY);
+						queue.add(curX+1);
 						//System.out.println("added");
 					}
 				}
 				
 				if (curX > 0) {
 					if (map1Coords[curY][curX-1].equals("1")) {
-						queue.add(curX-1);
 						queue.add(curY);
+						queue.add(curX-1);
 					}
 				}
 				
