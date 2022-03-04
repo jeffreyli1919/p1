@@ -1,6 +1,7 @@
 package p1;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
@@ -17,8 +18,8 @@ public class p1 {
 	
 	public static void main(String[] args) {
 		Scanner scanner = null;
-		File f = new File("JeffMap3.txt");
-		coordBased= false;
+		File f = new File("JeffMap3Coord.txt");
+		coordBased = false;
 		
 		try {
 			//code that might throw a special error
@@ -84,7 +85,7 @@ public class p1 {
 			
 			//solution if input is regular
 			if (!coordBased) {
-				stackSolution(scanner, map1);
+				queueCakeLocation(scanner, map1);
 			}
 			
 			
@@ -150,6 +151,7 @@ public class p1 {
 			
 			long locationStart = System.currentTimeMillis();
 			Queue<Integer> queue = new LinkedList<>();
+			ArrayList<Integer> dequeue = new ArrayList<>();
 			int cakeRow = 0;
 			int cakeCol = 0;
 			
@@ -170,9 +172,13 @@ public class p1 {
 			while (queue.size() > 0) {
 				int curRow = queue.remove(); //x
 				int curCol = queue.remove(); //y
-				System.out.println(curRow + " " + curCol);
+				dequeue.add(curRow);
+				dequeue.add(curCol);
+				//System.out.println(curRow + " " + curCol);
+				if (map[curRow][curCol].equals("1")) {
+					map[curRow][curCol] = "+";
+				}
 			
-				map[curRow][curCol] = "+";
 				
 				if (curCol > 0) {
 					if (map[curRow][curCol-1].equals("C")) {
@@ -183,7 +189,6 @@ public class p1 {
 					} else if (map[curRow][curCol-1].equals("1")) {
 						queue.add(curRow);
 						queue.add(curCol-1);
-						
 					}
 				}
 				if (curCol < cols-1) {
@@ -223,12 +228,25 @@ public class p1 {
 				}
 				
 				//System.out.println("end");
-				System.out.println("size: " + queue.size());
+				//System.out.println("size: " + queue.size());
 			}
 			
 			System.out.println();
 			System.out.println("Cake Row: "  + cakeRow + " Cake Col: " + cakeCol);
 			System.out.println("location runtime: " + (System.currentTimeMillis()-locationStart));
+			
+			//optimal path
+			for (int i = 0; i < dequeue.size(); i+=2) {
+				int temp = dequeue.get(i);
+				int temp2 = dequeue.get(i+1);
+				System.out.println("row: " + temp + "col: " + temp2);
+			}
+			
+			//removing non optimal moves from dequeue
+			int x = 1;
+			while (x < dequeue.size()) {
+				
+			}
 			
 			for (int i = 0; i < map.length; i++) {
 				for (int j = 0; j < map[0].length; j++) {
@@ -265,7 +283,7 @@ public class p1 {
 			while (stack.size() > 0) {
 				int curRow = stack.pop(); //x
 				int curCol = stack.pop(); //y
-				System.out.println(curRow + " " + curCol);
+				//System.out.println(curRow + " " + curCol);
 			
 				map[curRow][curCol] = "+";
 				
@@ -317,12 +335,14 @@ public class p1 {
 					}
 				}
 				
-				System.out.println("size: " + stack.size());
+				//System.out.println("size: " + stack.size());
 			}
 			
 			System.out.println();
 			System.out.println("Cake Row: "  + cakeRow + " Cake Col: " + cakeCol);
 			System.out.println("location runtime: " + (System.currentTimeMillis()-locationStart));
+			
+			
 			
 			for (int i = 0; i < map.length; i++) {
 				for (int j = 0; j < map[0].length; j++) {
@@ -330,6 +350,8 @@ public class p1 {
 				}
 				System.out.println();
 			}
+			
+			
 			
 		} catch(Exception e) {
 			System.out.println();
