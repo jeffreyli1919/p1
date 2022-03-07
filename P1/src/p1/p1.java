@@ -15,10 +15,11 @@ public class p1 {
 	static long start;
 	static String[][] map1Coords;
 	private static boolean coordBased;
+	private static ArrayList<Integer> dequeue = new ArrayList<>();
 	
 	public static void main(String[] args) {
 		Scanner scanner = null;
-		File f = new File("JeffMap3Coord.txt");
+		File f = new File("JeffMap1Coord.txt");
 		coordBased = false;
 		
 		try {
@@ -151,7 +152,6 @@ public class p1 {
 			
 			long locationStart = System.currentTimeMillis();
 			Queue<Integer> queue = new LinkedList<>();
-			ArrayList<Integer> dequeue = new ArrayList<>();
 			int cakeRow = 0;
 			int cakeCol = 0;
 			
@@ -174,21 +174,29 @@ public class p1 {
 				int curCol = queue.remove(); //y
 				dequeue.add(curRow);
 				dequeue.add(curCol);
-				//System.out.println(curRow + " " + curCol);
-				if (map[curRow][curCol].equals("1")) {
-					map[curRow][curCol] = "+";
-				}
 			
-				
-				if (curCol > 0) {
-					if (map[curRow][curCol-1].equals("C")) {
-						cakeRow = curRow;
-						cakeCol = curCol - 1;
+				if (curRow > 0) {
+					if (map[curRow-1][curCol].equals("C")) {
+						cakeRow = curRow-1;
+						cakeCol = curCol;
 						System.out.print("found");
 						break;
-					} else if (map[curRow][curCol-1].equals("1")) {
-						queue.add(curRow);
-						queue.add(curCol-1);
+					} else if (map[curRow-1][curCol].equals("1")) {
+						queue.add(curRow-1);
+						queue.add(curCol);
+						map[curRow-1][curCol] = "-1";
+					}
+				}
+				if (curRow < rows-1) {
+					if (map[curRow+1][curCol].equals("C")) {
+						cakeRow = curRow+1;
+						cakeCol = curCol;
+						System.out.print("found");
+						break;
+					}else if (map[curRow+1][curCol].equals("1")) {
+						queue.add(curRow+1);
+						queue.add(curCol);
+						map[curRow+1][curCol] = "-1";
 					}
 				}
 				if (curCol < cols-1) {
@@ -200,32 +208,26 @@ public class p1 {
 					} else if (map[curRow][curCol + 1].equals("1")) {
 						queue.add(curRow);
 						queue.add(curCol+1);
+						map[curRow][curCol+1] = "-1";
+					}
+				}
+				if (curCol > 0) {
+					if (map[curRow][curCol-1].equals("C")) {
+						cakeRow = curRow;
+						cakeCol = curCol - 1;
+						System.out.print("found");
+						break;
+					} else if (map[curRow][curCol-1].equals("1")) {
+						queue.add(curRow);
+						queue.add(curCol-1);
+						map[curRow][curCol-1] = "-1";
 					}
 				}
 				
-				if (curRow < rows-1) {
-					if (map[curRow+1][curCol].equals("C")) {
-						cakeRow = curRow+1;
-						cakeCol = curCol;
-						System.out.print("found");
-						break;
-					}else if (map[curRow+1][curCol].equals("1")) {
-						queue.add(curRow+1);
-						queue.add(curCol);
-					}
-				}
 				
-				if (curRow > 0) {
-					if (map[curRow-1][curCol].equals("C")) {
-						cakeRow = curRow-1;
-						cakeCol = curCol;
-						System.out.print("found");
-						break;
-					} else if (map[curRow-1][curCol].equals("1")) {
-						queue.add(curRow-1);
-						queue.add(curCol);
-					}
-				}
+				
+				
+				
 				
 				//System.out.println("end");
 				//System.out.println("size: " + queue.size());
@@ -234,6 +236,10 @@ public class p1 {
 			System.out.println();
 			System.out.println("Cake Row: "  + cakeRow + " Cake Col: " + cakeCol);
 			System.out.println("location runtime: " + (System.currentTimeMillis()-locationStart));
+			System.out.println(dequeue.size());
+			
+
+			
 			
 			//optimal path
 			for (int i = 0; i < dequeue.size(); i+=2) {
@@ -243,13 +249,57 @@ public class p1 {
 			}
 			
 			//removing non optimal moves from dequeue
-			int x = 1;
-			while (x < dequeue.size()) {
+			int x = 0;
+			while (x < dequeue.size() - 5) {
+				int curRow = dequeue.get(x);
+				int curCol = dequeue.get(x+1);
+				int tempRow1 = dequeue.get(x+2);
+				int tempCol1 = dequeue.get(x+3);
+				int tempRow2 = dequeue.get(x+4);
+				int tempCol2 = dequeue.get(x+5);
+				
+				//determine if possible move from curRow and curCol to next step
+				if (!(curRow == tempRow1 && curCol == tempCol1-1 || curRow == tempRow1 && curCol == tempCol1+1 ||
+						curRow == tempRow1+1 && curCol == tempCol1 || curRow == tempRow1-1 && curCol == tempCol1)) {
+					dequeue.remove(x+2);
+					dequeue.remove(x+2);
+				} else if (!(curRow == tempRow2 && curCol == tempCol2-1 || curRow == tempRow2 && curCol == tempCol2+1 ||
+						curRow == tempRow2+1 && curCol == tempCol2 || curRow == tempRow2-1 && curCol == tempCol2)) {
+					dequeue.remove(x+4);
+					dequeue.remove(x+4);
+					x+=2;
+				} else {
+					if (shorterDistance(tempRow1, tempCol1, tempRow2, tempCol2, cakeRow, cakeCol)) {
+						dequeue.remove(x+4);
+						dequeue.remove(x+4);
+						x+=2;
+					} else {
+						dequeue.remove(x+2);
+						dequeue.remove(x+2);
+						x+=2;
+					}
+				}
 				
 			}
 			
+			System.out.println();
+			
+			//printing optimal coords
+			for (int i = 2; i < dequeue.size(); i+=2) {
+				int temp = dequeue.get(i);
+				int temp2 = dequeue.get(i+1);
+				System.out.println("row: " + temp + "col: " + temp2);
+				map[temp][temp2] = "+";
+				
+				
+			}
+			
+			//printing solution map
 			for (int i = 0; i < map.length; i++) {
 				for (int j = 0; j < map[0].length; j++) {
+					if (map[i][j] == "-1") {
+						map[i][j] = ".";
+					}
 					System.out.print(map[i][j]);
 				}
 				System.out.println();
@@ -261,102 +311,16 @@ public class p1 {
 		}
 	}
 	
-	public static void stackSolution(Scanner scan, String[][] map) {
-		try {
-			long locationStart = System.currentTimeMillis();
-			Stack<Integer> stack = new Stack<>();
-			int cakeRow = 0;
-			int cakeCol = 0;
-			
-			for (int i = 0; i < rows; i++) {
-				for (int j = 0; j < cols; j++) {
-					if (map[i][j].equals(".")) {
-						map[i][j] = "1";
-					} else if (map[i][j].equals("K")) {
-						stack.push(i);
-						stack.push(j);
-					} 
-				}
-			}
-
-			
-			while (stack.size() > 0) {
-				int curRow = stack.pop(); //x
-				int curCol = stack.pop(); //y
-				//System.out.println(curRow + " " + curCol);
-			
-				map[curRow][curCol] = "+";
-				
-				if (curCol > 0) {
-					if (map[curRow][curCol-1].equals("C")) {
-						cakeRow = curRow;
-						cakeCol = curCol - 1;
-						System.out.print("found");
-						break;
-					} else if (map[curRow][curCol-1].equals("1")) {
-						stack.push(curRow);
-						stack.push(curCol-1);
-						
-					}
-				}
-				if (curCol < cols-1) {
-					if (map[curRow][curCol+1].equals("C")) {
-						cakeRow = curRow;
-						cakeCol = curCol+1;
-						System.out.print("found");
-						break;
-					} else if (map[curRow][curCol + 1].equals("1")) {
-						stack.push(curRow);
-						stack.push(curCol+1);
-					}
-				}
-				
-				if (curRow < rows-1) {
-					if (map[curRow+1][curCol].equals("C")) {
-						cakeRow = curRow+1;
-						cakeCol = curCol;
-						System.out.print("found");
-						break;
-					}else if (map[curRow+1][curCol].equals("1")) {
-						stack.push(curRow+1);
-						stack.push(curCol);
-					}
-				}
-				
-				if (curRow > 0) {
-					if (map[curRow-1][curCol].equals("C")) {
-						cakeRow = curRow-1;
-						cakeCol = curCol;
-						System.out.print("found");
-						break;
-					} else if (map[curRow-1][curCol].equals("1")) {
-						stack.push(curRow-1);
-						stack.push(curCol);
-					}
-				}
-				
-				//System.out.println("size: " + stack.size());
-			}
-			
-			System.out.println();
-			System.out.println("Cake Row: "  + cakeRow + " Cake Col: " + cakeCol);
-			System.out.println("location runtime: " + (System.currentTimeMillis()-locationStart));
-			
-			
-			
-			for (int i = 0; i < map.length; i++) {
-				for (int j = 0; j < map[0].length; j++) {
-					System.out.print(map[i][j]);
-				}
-				System.out.println();
-			}
-			
-			
-			
-		} catch(Exception e) {
-			System.out.println();
-			System.out.println(e);
+	
+	//true if 1-3 is shorter, false if 2-3 is shorter
+	public static boolean shorterDistance(int x1, int y1, int x2, int y2, int x3, int y3) {
+		int distance1 = (int) Math.pow((Math.pow(x1-x3, 2) + Math.pow(y1-y3, 2)), 0.5);
+		int distance2 = (int) Math.pow((Math.pow(x2-x3, 2) + Math.pow(y2-y3, 2)), 0.5);
+		
+		if (distance1 == distance2) {
+			shorterDistance(x1, y1, x2, y2, dequeue.get(dequeue.size()), dequeue.get(dequeue.size()));
 		}
+		return distance1 < distance2;
 	}
 }
 
