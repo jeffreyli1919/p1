@@ -19,7 +19,7 @@ public class p1 {
 	
 	public static void main(String[] args) {
 		Scanner scanner = null;
-		File f = new File("JeffMap1Coord.txt");
+		File f = new File("JeffMap3.txt");
 		coordBased = false;
 		
 		try {
@@ -87,20 +87,10 @@ public class p1 {
 			//solution if input is regular
 			if (!coordBased) {
 				queueCakeLocation(scanner, map1);
-			}
-			
-			
-			
-			
-			
-			
-			
+			}	
 			
 		} catch(Exception e) {
-			System.out.println(e);
-			
-			
-			
+			System.out.println(e);	
 		}
 		
 	}
@@ -167,7 +157,6 @@ public class p1 {
 					} 
 				}
 			}
-
 			
 			while (queue.size() > 0) {
 				int curRow = queue.remove(); //x
@@ -223,31 +212,45 @@ public class p1 {
 						map[curRow][curCol-1] = "-1";
 					}
 				}
-				
-				
-				
-				
-				
-				
-				//System.out.println("end");
-				//System.out.println("size: " + queue.size());
 			}
 			
 			System.out.println();
 			System.out.println("Cake Row: "  + cakeRow + " Cake Col: " + cakeCol);
-			System.out.println("location runtime: " + (System.currentTimeMillis()-locationStart));
-			System.out.println(dequeue.size());
+	
+			//optimal path from cake
 			
-
-			
-			
-			//optimal path
 			for (int i = 0; i < dequeue.size(); i+=2) {
 				int temp = dequeue.get(i);
 				int temp2 = dequeue.get(i+1);
 				System.out.println("row: " + temp + "col: " + temp2);
 			}
 			
+			
+	
+			int index = dequeue.size();
+			while (index >= 2) {
+				int curRow = cakeRow;
+				int curCol = cakeCol;
+				int tempRow1 = dequeue.get(index-2);
+				int tempCol1 = dequeue.get(index-1);
+				if (curRow == tempRow1 && curCol == tempCol1-1 || curRow == tempRow1 && curCol == tempCol1+1 ||
+						curRow == tempRow1+1 && curCol == tempCol1 || curRow == tempRow1-1 && curCol == tempCol1) {
+					curRow = tempRow1;
+					curCol = tempCol1;
+					index -= 2;
+				} else {
+					System.out.println("removed");
+					dequeue.remove(index-1);
+					dequeue.remove(index-2);
+					index-=2;
+				}
+			}
+			
+			
+			
+			//optimal path using distance and arraylist from kirby
+			
+			/*
 			//removing non optimal moves from dequeue
 			int x = 0;
 			while (x < dequeue.size() - 5) {
@@ -265,11 +268,9 @@ public class p1 {
 					dequeue.remove(x+2);
 				} else if (!(curRow == tempRow2 && curCol == tempCol2-1 || curRow == tempRow2 && curCol == tempCol2+1 ||
 						curRow == tempRow2+1 && curCol == tempCol2 || curRow == tempRow2-1 && curCol == tempCol2)) {
-					dequeue.remove(x+4);
-					dequeue.remove(x+4);
 					x+=2;
 				} else {
-					if (shorterDistance(tempRow1, tempCol1, tempRow2, tempCol2, cakeRow, cakeCol)) {
+					if (shorterDistance(tempRow1, tempCol1, tempRow2, tempCol2, cakeRow, cakeCol, 0)) {
 						dequeue.remove(x+4);
 						dequeue.remove(x+4);
 						x+=2;
@@ -281,6 +282,7 @@ public class p1 {
 				}
 				
 			}
+			*/
 			
 			System.out.println();
 			
@@ -290,7 +292,6 @@ public class p1 {
 				int temp2 = dequeue.get(i+1);
 				System.out.println("row: " + temp + "col: " + temp2);
 				map[temp][temp2] = "+";
-				
 				
 			}
 			
@@ -304,6 +305,7 @@ public class p1 {
 				}
 				System.out.println();
 			}
+			System.out.println("solution runtime: " + (System.currentTimeMillis()-locationStart));
 			
 		} catch(Exception e) {
 			System.out.println();
@@ -313,12 +315,16 @@ public class p1 {
 	
 	
 	//true if 1-3 is shorter, false if 2-3 is shorter
-	public static boolean shorterDistance(int x1, int y1, int x2, int y2, int x3, int y3) {
+	static int temp = dequeue.size()-1;
+	public static boolean shorterDistance(int x1, int y1, int x2, int y2, int x3, int y3, int iter) {
 		int distance1 = (int) Math.pow((Math.pow(x1-x3, 2) + Math.pow(y1-y3, 2)), 0.5);
 		int distance2 = (int) Math.pow((Math.pow(x2-x3, 2) + Math.pow(y2-y3, 2)), 0.5);
 		
 		if (distance1 == distance2) {
-			shorterDistance(x1, y1, x2, y2, dequeue.get(dequeue.size()), dequeue.get(dequeue.size()));
+			iter++;
+			x3 = dequeue.get(dequeue.size()-2*iter);
+			y3 = dequeue.get(dequeue.size()-1*iter);
+			return shorterDistance(x1, y1, x2, y2, x3, y3, iter);
 		}
 		return distance1 < distance2;
 	}
