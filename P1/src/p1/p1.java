@@ -13,13 +13,13 @@ public class p1 {
 	private static int cols;
 	private static int rooms;
 	static long start;
-	static String[][] map1Coords;
+	static String[][] mapCoords;
 	private static boolean coordBased;
 	private static ArrayList<Integer> dequeue = new ArrayList<>();
 	
 	public static void main(String[] args) {
 		Scanner scanner = null;
-		File f = new File("JeffMap2.txt");
+		File f = new File("JeffMap2Coord.txt");
 		coordBased = false;
 		
 		try {
@@ -29,7 +29,7 @@ public class p1 {
 			cols = scanner.nextInt();
 			rooms = scanner.nextInt();
 			System.out.println(rows + " " + cols + " " + rooms);
-			map1Coords = new String[rows][cols];		
+			mapCoords = new String[rows*rooms][cols];		
 			int currentRow = 0;
 			String[][] map1 = new String[rows*rooms][cols];
 			scanner.nextLine();
@@ -37,12 +37,12 @@ public class p1 {
 			
 			start = System.currentTimeMillis();
 			
-			
+		
 			//determine if input map is coordinate or regular
 			String first = scanner.nextLine();
 			if (first.substring(2, 3).equals("0")) {
 				coordBased = true;
-				map1Coords[0][0] = first.substring(0, 1);
+				mapCoords[0][0] = first.substring(0, 1);
 			} else {
 				for (int i = 0; i < first.length(); i++) {
 					map1[currentRow][i] = first.substring(i, i+1);
@@ -51,34 +51,47 @@ public class p1 {
 				currentRow++;
 			}
 			
-			//if regular input map fill in map1
-			while (scanner.hasNextLine() && coordBased == false) {
-				String line = scanner.nextLine();
-				if (currentRow < rows*rooms) {
-					for (int i = 0; i < cols; i++) {
-						map1[currentRow][i] = line.substring(i, i+1);
+			if (coordBased == false) {
+				//if regular input map fill in map1
+				while (scanner.hasNextLine() && coordBased == false) {
+					String line = scanner.nextLine();
+					if (currentRow < rows*rooms) {
+						for (int i = 0; i < cols; i++) {
+							map1[currentRow][i] = line.substring(i, i+1);
+						}
+					}
+					currentRow++;
+					//use charAt to grab the elements of the map for a given row
+				}
+				
+				
+				System.out.println("runtime: " + (System.currentTimeMillis()-start));
+				
+				
+				/*
+				//printing coord based map with regular map input
+				for (int i = 0; i < rooms; i++) {
+					for (int j = i*rows; j < rows*(i+1); j++) {
+						for (int k = 0; k < map1[0].length; k++) {
+							System.out.println(map1[j][k] + " " + (j - (rows*i)) + " " + k);
+						}
 					}
 				}
-				currentRow++;
-				//use charAt to grab the elements of the map for a given row
-			}
-			
-			
-			System.out.println("runtime: " + (System.currentTimeMillis()-start));
-			
-			//printing map
-			for (int i = 0; i < map1.length; i++) {
-				for (int j = 0; j < map1[0].length; j++) {
-					System.out.print(map1[i][j]);
+				*/
+				for (int i = 0 ; i < map1.length; i++) {
+					for (int j = 0 ; j < map1[0].length; j++) {
+						System.out.print(map1[i][j]);
+					}
+					System.out.println();
 				}
-				System.out.println();
 			}
-		
+			
+			
 			//solution if input is coordinate based
 			if (coordBased) {
 				coordinateBased(scanner);
 				for (int i = 1; i <= rooms; i++) {
-					queueCakeLocation(scanner, map1Coords, i);
+					queueCakeLocation(scanner, mapCoords, i);
 				}
 				
 			}
@@ -104,13 +117,17 @@ public class p1 {
 			
 			
 			//Integer.valueOf(null) to convert from strings to ints
+			int currentRoom = 0;
 			while (scan.hasNextLine()) {
 				String line = scan.nextLine();
 				String symbol = line.substring(0, 1);
 				Integer curRow = Integer.valueOf(line.substring(2, 3));
 				Integer curCol = Integer.valueOf(line.substring(4, 5));
-				map1Coords[curRow][curCol] = symbol;
-				System.out.println(symbol + " " + curRow + " " + curCol);
+				if (curRow == 0 && curCol == 0) {
+					currentRoom++;
+				}
+				mapCoords[curRow+(currentRoom*10)][curCol] = symbol;
+				//System.out.println(symbol + " " + curRow + " " + curCol);
 			
 				
 				
@@ -120,10 +137,10 @@ public class p1 {
 			//printing out 2d array map1coords
 			System.out.println();
 			System.out.println("map1Coords: ");
-			for (int i = 0; i < rows; i++) {
+			for (int i = 0; i < rows*rooms; i++) {
 				System.out.println();
 				for (int j = 0; j < cols; j++) {
-					System.out.print(map1Coords[i][j]);
+					System.out.print(mapCoords[i][j]);
 				}
 			}
 			
@@ -166,7 +183,7 @@ public class p1 {
 				dequeue.add(curRow);
 				dequeue.add(curCol);
 			
-				if (curRow > 0) {
+				if (curRow > (currentRoom-1)*rows) {
 					if (map[curRow-1][curCol].equals("C") || map[curRow-1][curCol].equals("|")) {
 						cakeRow = curRow-1;
 						cakeCol = curCol;
@@ -175,10 +192,10 @@ public class p1 {
 					} else if (map[curRow-1][curCol].equals("1")) {
 						queue.add(curRow-1);
 						queue.add(curCol);
-						map[curRow-1][curCol] = "-1";
+						map[curRow-1][curCol] = "2";
 					}
 				}
-				if (curRow < rows-1) {
+				if (curRow-((currentRoom-1)*rows) < rows-1) {
 					if (map[curRow+1][curCol].equals("C") || map[curRow+1][curCol].equals("|")) {
 						cakeRow = curRow+1;
 						cakeCol = curCol;
@@ -187,7 +204,7 @@ public class p1 {
 					}else if (map[curRow+1][curCol].equals("1")) {
 						queue.add(curRow+1);
 						queue.add(curCol);
-						map[curRow+1][curCol] = "-1";
+						map[curRow+1][curCol] = "2";
 					}
 				}
 				if (curCol < cols-1) {
@@ -199,7 +216,7 @@ public class p1 {
 					} else if (map[curRow][curCol + 1].equals("1")) {
 						queue.add(curRow);
 						queue.add(curCol+1);
-						map[curRow][curCol+1] = "-1";
+						map[curRow][curCol+1] = "2";
 					}
 				}
 				if (curCol > 0) {
@@ -211,7 +228,7 @@ public class p1 {
 					} else if (map[curRow][curCol-1].equals("1")) {
 						queue.add(curRow);
 						queue.add(curCol-1);
-						map[curRow][curCol-1] = "-1";
+						map[curRow][curCol-1] = "2";
 					}
 				}
 			}
@@ -225,7 +242,7 @@ public class p1 {
 			for (int i = 0; i < dequeue.size(); i+=2) {
 				int temp = dequeue.get(i);
 				int temp2 = dequeue.get(i+1);
-				System.out.println("row: " + temp + "col: " + temp2);
+				//System.out.println("row: " + temp + "col: " + temp2);
 			}
 			
 			//finding and printing solution
@@ -253,24 +270,27 @@ public class p1 {
 			for (int i = 2; i < dequeue.size(); i+=2) {
 				int temp = dequeue.get(i);
 				int temp2 = dequeue.get(i+1);
-				System.out.println("row: " + temp + "col: " + temp2);
+				//System.out.println("row: " + temp + "col: " + temp2);
 				map[temp][temp2] = "+";
 				
 			}
 			
 			//printing solution map
-			for (int i = 0; i < map.length; i++) {
-				for (int j = 0; j < map[0].length; j++) {
-					if (map[i][j] == "-1") {
-						map[i][j] = ".";
-					} else if (map[i][j] == "1") {
-						map[i][j] = ".";
+			if (currentRoom == rooms) {
+				for (int i = 0; i < map.length; i++) {
+					for (int j = 0; j < map[0].length; j++) {
+						if (map[i][j] == "2") {
+							map[i][j] = ".";
+						} else if (map[i][j] == "1") {
+							map[i][j] = ".";
+						}
+						System.out.print(map[i][j]);
 					}
-					System.out.print(map[i][j]);
+					System.out.println();
 				}
-				System.out.println();
+				System.out.println("solution runtime: " + (System.currentTimeMillis()-locationStart));
 			}
-			System.out.println("solution runtime: " + (System.currentTimeMillis()-locationStart));
+			
 			
 		} catch(Exception e) {
 			System.out.println();
