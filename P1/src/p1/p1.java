@@ -15,6 +15,7 @@ public class p1 {
 	static long start;
 	static String[][] mapCoords;
 	private static boolean coordBased;
+	private static Queue<Integer> queue = new LinkedList<>();
 	private static ArrayList<Integer> dequeue = new ArrayList<>();
 	
 	public static void main(String[] args) {
@@ -43,6 +44,7 @@ public class p1 {
 			if (first.substring(2, 3).equals("0")) {
 				coordBased = true;
 				mapCoords[0][0] = first.substring(0, 1);
+				//System.out.print(mapCoords[0][0]);
 			} else {
 				for (int i = 0; i < first.length(); i++) {
 					map1[currentRow][i] = first.substring(i, i+1);
@@ -68,7 +70,7 @@ public class p1 {
 				System.out.println("runtime: " + (System.currentTimeMillis()-start));
 				
 				
-				/*
+				
 				//printing coord based map with regular map input
 				for (int i = 0; i < rooms; i++) {
 					for (int j = i*rows; j < rows*(i+1); j++) {
@@ -77,7 +79,7 @@ public class p1 {
 						}
 					}
 				}
-				*/
+				
 				for (int i = 0 ; i < map1.length; i++) {
 					for (int j = 0 ; j < map1[0].length; j++) {
 						System.out.print(map1[i][j]);
@@ -118,16 +120,45 @@ public class p1 {
 			
 			//Integer.valueOf(null) to convert from strings to ints
 			int currentRoom = 0;
+			int col = 1;
+			int row = 0;
+			Integer curRow = 0;
+			Integer curCol = 0;
+			
 			while (scan.hasNextLine()) {
-				String line = scan.nextLine();
-				String symbol = line.substring(0, 1);
-				Integer curRow = Integer.valueOf(line.substring(2, 3));
-				Integer curCol = Integer.valueOf(line.substring(4, 5));
-				if (curRow == 0 && curCol == 0) {
+				if (col >= cols) {
+					col = 0;
+					row++;
+				} 
+				
+				if (row >= rows) {
+					row = 0;
+					col = 0;
 					currentRoom++;
 				}
-				mapCoords[curRow+(currentRoom*10)][curCol] = symbol;
+				
+				String line = scan.nextLine();
+				String symbol = line.substring(0, 1);
+				
+				if (row >= 10 && col < 10) {
+					curRow = Integer.valueOf(line.substring(2, 4));
+					curCol = Integer.valueOf(line.substring(5, 6));
+				} else if (row < 10 && col >= 10){
+					curRow = Integer.valueOf(line.substring(2, 3));
+					curCol = Integer.valueOf(line.substring(4, 6));
+				} else if (row >= 10 && col >= 10) {
+					curRow = Integer.valueOf(line.substring(2, 4));
+					curCol = Integer.valueOf(line.substring(5, 7));
+				} else {
+					curRow = Integer.valueOf(line.substring(2, 3));
+					curCol = Integer.valueOf(line.substring(4, 5));
+				}
+
+				col++;
+				mapCoords[curRow+(currentRoom*rows)][curCol] = symbol;
 				//System.out.println(symbol + " " + curRow + " " + curCol);
+				//System.out.println("row: " + row + " col: " + col);
+				
 			
 				
 				
@@ -155,15 +186,10 @@ public class p1 {
 	
 	public static void queueCakeLocation(Scanner scan, String[][] map, int currentRoom) {
 		try {
-			//solution for coord based
-			//finding kirby and possible spaces for kirby
-			
-			
+
 			long locationStart = System.currentTimeMillis();
-			Queue<Integer> queue = new LinkedList<>();
 			int cakeRow = -1;
 			int cakeCol = -1;
-			
 			
 			//turning available paths . into 1 and finding initial location
 			for (int i = rows*(currentRoom-1); i < rows*currentRoom; i++) {
@@ -187,7 +213,6 @@ public class p1 {
 					if (map[curRow-1][curCol].equals("C") || map[curRow-1][curCol].equals("|")) {
 						cakeRow = curRow-1;
 						cakeCol = curCol;
-						System.out.print("found");
 						break;
 					} else if (map[curRow-1][curCol].equals("1")) {
 						queue.add(curRow-1);
@@ -199,7 +224,6 @@ public class p1 {
 					if (map[curRow+1][curCol].equals("C") || map[curRow+1][curCol].equals("|")) {
 						cakeRow = curRow+1;
 						cakeCol = curCol;
-						System.out.print("found");
 						break;
 					}else if (map[curRow+1][curCol].equals("1")) {
 						queue.add(curRow+1);
@@ -211,7 +235,6 @@ public class p1 {
 					if (map[curRow][curCol+1].equals("C") || map[curRow][curCol + 1].equals("|")) {
 						cakeRow = curRow;
 						cakeCol = curCol+1;
-						System.out.print("found");
 						break;
 					} else if (map[curRow][curCol + 1].equals("1")) {
 						queue.add(curRow);
@@ -223,7 +246,6 @@ public class p1 {
 					if (map[curRow][curCol-1].equals("C") || map[curRow][curCol-1].equals("|")) {
 						cakeRow = curRow;
 						cakeCol = curCol - 1;
-						System.out.print("found");
 						break;
 					} else if (map[curRow][curCol-1].equals("1")) {
 						queue.add(curRow);
@@ -234,18 +256,8 @@ public class p1 {
 			}
 			
 			System.out.println();
-			System.out.println("Cake Row: "  + cakeRow + " Cake Col: " + cakeCol);
 			
-			//optimal path from cake
-			
-			//printing all moves
-			for (int i = 0; i < dequeue.size(); i+=2) {
-				int temp = dequeue.get(i);
-				int temp2 = dequeue.get(i+1);
-				//System.out.println("row: " + temp + "col: " + temp2);
-			}
-			
-			//finding and printing solution
+			//finding optimal path
 			int index = dequeue.size();
 			int curRow = cakeRow;
 			int curCol = cakeCol;
@@ -264,33 +276,12 @@ public class p1 {
 				index -= 2;
 			}
 			
-			System.out.println();
+			findOptimalPath(map);
 			
-			//printing optimal coords
-			for (int i = 2; i < dequeue.size(); i+=2) {
-				int temp = dequeue.get(i);
-				int temp2 = dequeue.get(i+1);
-				//System.out.println("row: " + temp + "col: " + temp2);
-				map[temp][temp2] = "+";
-				
-			}
-			
-			//printing solution map
 			if (currentRoom == rooms) {
-				for (int i = 0; i < map.length; i++) {
-					for (int j = 0; j < map[0].length; j++) {
-						if (map[i][j] == "2") {
-							map[i][j] = ".";
-						} else if (map[i][j] == "1") {
-							map[i][j] = ".";
-						}
-						System.out.print(map[i][j]);
-					}
-					System.out.println();
-				}
-				System.out.println("solution runtime: " + (System.currentTimeMillis()-locationStart));
+				printSolution(map);
 			}
-			
+			System.out.println("solution runtime: " + (System.currentTimeMillis()-locationStart));
 			
 		} catch(Exception e) {
 			System.out.println();
@@ -298,7 +289,33 @@ public class p1 {
 		}
 	}
 	
+	public static void findOptimalPath(String map[][]) {
+		
+		//printing optimal coords
+		for (int i = 2; i < dequeue.size(); i+=2) {
+			int temp = dequeue.get(i);
+			int temp2 = dequeue.get(i+1);
+			//System.out.println("row: " + temp + "col: " + temp2);
+			map[temp][temp2] = "+";
+		}
+	}
+	public static void printSolution(String map[][]) {
+		//printing solution map
+		for (int i = 0; i < map.length; i++) {
+			for (int j = 0; j < map[0].length; j++) {
+				if (map[i][j] == "2") {
+					map[i][j] = ".";
+				} else if (map[i][j] == "1") {
+					map[i][j] = ".";
+				}
+				System.out.print(map[i][j]);
+			}
+			System.out.println();
+		}
+		
+	}
 	
+	/*
 	//true if 1-3 is shorter, false if 2-3 is shorter
 	static int temp = dequeue.size()-1;
 	public static boolean shorterDistance(int x1, int y1, int x2, int y2, int x3, int y3, int iter) {
@@ -313,6 +330,7 @@ public class p1 {
 		}
 		return distance1 < distance2;
 	}
+	*/
 	
 
 	
