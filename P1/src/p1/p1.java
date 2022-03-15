@@ -20,12 +20,22 @@ public class p1 {
 		Scanner scanner = null;
 		File f = new File("JeffMap6Coord.txt");
 		//can change these based on if you want to solve using stack/queue approach and desired output
-		queueBased = true;
-		coordBasedOutput = false;
-		//can't change these
-		coordBasedInput = false;
-		legalInput = true;
-		isSolution = false;
+				queueBased = true;
+				coordBasedOutput = false;
+				//can't change these
+				coordBasedInput = false;
+				legalInput = true;
+				isSolution = false;
+		
+		
+		
+		for (int i = 0; i < args.length; i++) {
+			System.out.println("Argument " + i  + ": "  + args[i]);
+			if (args[i].equals("--Stack")) {
+				queueBased = false;
+			} 
+		}
+		
 		
 		
 		try {
@@ -79,9 +89,8 @@ public class p1 {
 					//use charAt to grab the elements of the map for a given row
 				}
 				
-				//printing runtime and original regular input map
+				//printing original regular input map
 				if (legalInput) {
-					System.out.println("runtime: " + (System.currentTimeMillis()-start));
 					for (int i = 0 ; i < map1.length; i++) {
 						for (int j = 0 ; j < map1[0].length; j++) {
 							System.out.print(map1[i][j]);
@@ -124,6 +133,8 @@ public class p1 {
 				}
 			}	
 			
+			//runtime
+			System.out.println("total runtime: " + (System.currentTimeMillis()-start));
 		} catch(Exception e) {
 			System.out.println(e);	
 		}
