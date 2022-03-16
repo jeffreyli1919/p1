@@ -16,8 +16,7 @@ public class p1 {
 	private static Stack<Integer> stack = new Stack<>();
 	private static ArrayList<Integer> dequeue = new ArrayList<>();
 	public static void main(String[] args) {
-		Scanner scanner = null;
-		File f = new File("JeffMap2Coord.txt");
+		
 				
 		//can't change these
 		coordBasedOutput = false;
@@ -48,13 +47,14 @@ public class p1 {
 				System.out.println("Enter '--Time' to see runtime.");
 				System.out.println("Enter '--Incoordinate' if the input file is coord Based.");
 				System.out.println("Enter '--Outcoordinate' to see output file in coord Based system.");
+				System.out.println("Important: Enter the name of the file containing your map as the last argument");
 				System.out.println("Enter '--Help' for help.");
 				System.exit(-1);
 			} 
 		}
 		
 		if (search != 1) {
-			System.out.println("Error: Please enter ONE of stack, queue, or opt for an approach");
+			System.out.println("Error: Please enter ONE of stack, queue, or opt for an approach. Enter '--Help' for help");
 			System.exit(-1);
 		}
 		
@@ -69,7 +69,8 @@ public class p1 {
 		}
 		//***************
 		
-		
+		Scanner scanner = null;
+		File f = new File(args[args.length-1]);
 		
 		try {
 			//code that might throw a special error
