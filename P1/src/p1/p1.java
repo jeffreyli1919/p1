@@ -10,31 +10,64 @@ import java.util.Stack;
 public class p1 {
 	
 	private static int rows, cols, rooms;
-	static long start;
 	static String[][] mapCoords;
-	private static boolean coordBasedInput, coordBasedOutput, legalInput, isSolution, queueBased;
+	private static boolean coordBasedInput, coordBasedOutput, legalInput, isSolution, queueBased, showRunTime;
 	private static Queue<Integer> queue = new LinkedList<>();
 	private static Stack<Integer> stack = new Stack<>();
 	private static ArrayList<Integer> dequeue = new ArrayList<>();
 	public static void main(String[] args) {
 		Scanner scanner = null;
-		File f = new File("JeffMap6Coord.txt");
-		//can change these based on if you want to solve using stack/queue approach and desired output
-				queueBased = true;
-				coordBasedOutput = false;
-				//can't change these
-				coordBasedInput = false;
-				legalInput = true;
-				isSolution = false;
+		File f = new File("JeffMap2Coord.txt");
+				
+		//can't change these
+		coordBasedOutput = false;
+		coordBasedInput = false;
+		legalInput = true;
+		isSolution = false;
+		showRunTime = false;
+				
 		
-		
-		
+		//*************Command Line Arguments
+		int search = 0;
 		for (int i = 0; i < args.length; i++) {
-			System.out.println("Argument " + i  + ": "  + args[i]);
+			//System.out.println("Argument " + i  + ": "  + args[i]);
 			if (args[i].equals("--Stack")) {
 				queueBased = false;
+				search++;
+			} else if (args[i].equals("--Queue")) {
+				queueBased = true;
+				search++;
+			} else if (args[i].equals("--Opt")) {
+				queueBased = true;
+				search++;
+			} else if (args[i].equals("--Help")) {
+				System.out.println("Enter commands to help Kirby solve the maze.");
+				System.out.println("Enter '--Stack' to use stack based approach.");
+				System.out.println("Enter '--Queue' to use queue based approach.");
+				System.out.println("Enter '--Opt' to use optimal approach.");
+				System.out.println("Enter '--Time' to see runtime.");
+				System.out.println("Enter '--Incoordinate' if the input file is coord Based.");
+				System.out.println("Enter '--Outcoordinate' to see output file in coord Based system.");
+				System.out.println("Enter '--Help' for help.");
+				System.exit(-1);
 			} 
 		}
+		
+		if (search != 1) {
+			System.out.println("Error: Please enter ONE of stack, queue, or opt for an approach");
+			System.exit(-1);
+		}
+		
+		for (int i = 0; i < args.length; i++) {
+			if (args[i].equals("--Time")) {
+				showRunTime = true;
+			} else if (args[i].equals("--Incoordinate")) {
+				coordBasedInput = true;
+			} else if (args[i].equals("--Outcoordinate")) {
+				coordBasedOutput = true;
+			} 
+		}
+		//***************
 		
 		
 		
@@ -47,14 +80,13 @@ public class p1 {
 			rows = scanner.nextInt();
 			cols = scanner.nextInt();
 			rooms = scanner.nextInt();
-			System.out.println(rows + " " + cols + " " + rooms);
+			//System.out.println(rows + " " + cols + " " + rooms);
 			mapCoords = new String[rows*rooms][cols];		
 			int currentRow = 0;
 			String[][] map1 = new String[rows*rooms][cols];
 			scanner.nextLine();
 			
 			
-			start = System.currentTimeMillis();
 			
 		
 			//determine if input map is coordinate or regular by simply looking at line 1
@@ -93,9 +125,9 @@ public class p1 {
 				if (legalInput) {
 					for (int i = 0 ; i < map1.length; i++) {
 						for (int j = 0 ; j < map1[0].length; j++) {
-							System.out.print(map1[i][j]);
+							//System.out.print(map1[i][j]);
 						}
-						System.out.println();
+						//System.out.println();
 					}
 				}
 			}
@@ -115,10 +147,14 @@ public class p1 {
 			if (coordBasedInput) {
 				coordinateBased(scanner);
 				if (legalInput) {
+					
+					double time = System.currentTimeMillis();
 					for (int i = 1; i <= rooms; i++) {
 						 if (queueBased)  {queueCakeLocation(scanner, mapCoords, i); }
 						 else { stackCakeLocation(scanner, mapCoords, i); }
 					}
+					if (showRunTime) System.out.println("Solution runtime: " + (((double) System.currentTimeMillis()) - time));
+					
 				}
 			}
 			
@@ -126,15 +162,16 @@ public class p1 {
 			//solution if input is regular
 			if (!coordBasedInput) {
 				if (legalInput) {
+					double time = System.currentTimeMillis();
 					for (int i = 1; i <= rooms; i++) {
 						if (queueBased) queueCakeLocation(scanner, map1, i);
 						 else { stackCakeLocation(scanner, map1, i); }
 					}
+					if (showRunTime) System.out.println("Solution runtime: " + (((double) System.currentTimeMillis()) - time));
 				}
 			}	
 			
 			//runtime
-			System.out.println("total runtime: " + (System.currentTimeMillis()-start));
 		} catch(Exception e) {
 			System.out.println(e);	
 		}
@@ -196,10 +233,9 @@ public class p1 {
 				}
 				
 			}
-			//print runtime and the map for coord based input
-			System.out.println("runtime: " + (System.currentTimeMillis()-start));
-			System.out.println();
-			System.out.println("map1Coords: ");
+			//print map for coord based input
+			//System.out.println();
+			//System.out.println("map1Coords: ");
 			boolean complete = true;
 			for (int i = 0; i < rows*rooms; i++) {
 				for (int j = 0; j < cols; j++) {
@@ -212,13 +248,13 @@ public class p1 {
 						break;
 					}
 					if (complete) {
-						System.out.print(mapCoords[i][j]);
+						//System.out.print(mapCoords[i][j]);
 					}
 				}
-				System.out.println();
+				//System.out.println();
 			}
 			
-			System.out.println();
+			//System.out.println();
 			
 		} catch(Exception e) {
 			legalInput = false;
@@ -229,7 +265,6 @@ public class p1 {
 	//this is the approach to finding the cake using a queue, called once for each room
 	public static void queueCakeLocation(Scanner scan, String[][] map, int currentRoom) {
 		try {
-			long locationStart = System.currentTimeMillis();
 			int cakeRow = -1;
 			int cakeCol = -1;
 			//turning available paths . into 1 and finding initial location
@@ -314,7 +349,6 @@ public class p1 {
 			//printing out the solution map if there is an optimal path within every room
 			if (isSolution) {
 				if (currentRoom == rooms) {
-					System.out.println("solution runtime: " + (System.currentTimeMillis()-locationStart));
 					if (!coordBasedOutput) {
 						printSolution(map);
 					}
@@ -331,7 +365,6 @@ public class p1 {
 	//this is the approach to finding the cake using a stack, called once for each room
 	public static void stackCakeLocation(Scanner scan, String[][] map, int currentRoom) {
 		try {
-			long locationStart = System.currentTimeMillis();
 			int cakeRow = -1;
 			int cakeCol = -1;
 			//turning available paths . into 1 and finding initial location of Kirby
@@ -416,7 +449,6 @@ public class p1 {
 			//calls to print solution if every room has an optimal path
 			if (isSolution) {
 				if (currentRoom == rooms) {
-					System.out.println("solution runtime: " + (System.currentTimeMillis()-locationStart));
 					if (!coordBasedOutput) {
 						printSolution(map);
 					}
@@ -491,11 +523,13 @@ public class p1 {
 			System.out.println();
 		}
 		
+		/*
 		if (queueBased) {
 			 System.out.println("Solution with Queue");
 		} else {
 			 System.out.println("Solution with Stack");
 		}
+		*/
 		
 	}
 }
