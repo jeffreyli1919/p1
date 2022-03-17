@@ -151,8 +151,8 @@ public class p1 {
 					
 					double time = System.currentTimeMillis();
 					for (int i = 1; i <= rooms; i++) {
-						 if (queueBased)  {queueCakeLocation(scanner, mapCoords, i); }
-						 else { stackCakeLocation(scanner, mapCoords, i); }
+						 if (queueBased)  {queueApproach(scanner, mapCoords, i); }
+						 else { stackApproach(scanner, mapCoords, i); }
 					}
 					if (showRunTime) System.out.println("Solution runtime: " + (((double) System.currentTimeMillis()) - time));
 					
@@ -165,8 +165,8 @@ public class p1 {
 				if (legalInput) {
 					double time = System.currentTimeMillis();
 					for (int i = 1; i <= rooms; i++) {
-						if (queueBased) queueCakeLocation(scanner, map1, i);
-						 else { stackCakeLocation(scanner, map1, i); }
+						if (queueBased) queueApproach(scanner, map1, i);
+						 else { stackApproach(scanner, map1, i); }
 					}
 					if (showRunTime) System.out.println("Solution runtime: " + (((double) System.currentTimeMillis()) - time));
 				}
@@ -264,7 +264,7 @@ public class p1 {
 		
 	}
 	//this is the approach to finding the cake using a queue, called once for each room
-	public static void queueCakeLocation(Scanner scan, String[][] map, int currentRoom) {
+	public static void queueApproach(Scanner scan, String[][] map, int currentRoom) {
 		try {
 			int cakeRow = -1;
 			int cakeCol = -1;
@@ -364,7 +364,7 @@ public class p1 {
 	}
 	
 	//this is the approach to finding the cake using a stack, called once for each room
-	public static void stackCakeLocation(Scanner scan, String[][] map, int currentRoom) {
+	public static void stackApproach(Scanner scan, String[][] map, int currentRoom) {
 		try {
 			int cakeRow = -1;
 			int cakeCol = -1;
