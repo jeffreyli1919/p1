@@ -23,7 +23,7 @@ public class p1 {
 		coordBasedInput = false;
 		legalInput = true;
 		isSolution = false;
-		showRunTime = false;
+		showRunTime = false; 
 				
 		
 		//*************Command Line Arguments
