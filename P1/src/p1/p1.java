@@ -132,9 +132,9 @@ public class p1 {
 					}
 				}
 			}
-			
-			/* this prints out the coords of a regular based map to make a coord-based input map
-			 * of the regular map input
+			/*
+			//this prints out the coords of a regular based map to make a coord-based input map
+			//of the regular map input
 			for (int i = 0; i < rooms; i++) {
 				for (int j = i*rows; j < rows*(i+1); j++) {
 					for (int k = 0; k < map1[0].length; k++) {
@@ -143,6 +143,7 @@ public class p1 {
 				}
 			}
 			*/
+			
 			
 			//solution if input is coordinate based
 			if (coordBasedInput) {
