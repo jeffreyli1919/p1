@@ -7,13 +7,18 @@ import java.util.Stack;
 
 public class p1 {
 	
-	private static int rows, cols, rooms;
+	static int rows, cols, rooms;
 	static String[][] mapCoords;
-	private static boolean coordBasedInput, coordBasedOutput, legalInput, isSolution, queueBased, showRunTime;
-	private static Queue<Integer> queue = new LinkedList<>();
-	private static Stack<Integer> stack = new Stack<>();
-	private static ArrayList<Integer> dequeue = new ArrayList<>();
+	static boolean coordBasedInput, coordBasedOutput, legalInput, isSolution, queueBased, showRunTime;
+	static Queue<Integer> queue = new LinkedList<>();
+	static Stack<Integer> stack = new Stack<>();
+	static ArrayList<Integer> dequeue = new ArrayList<>();
+	
+	
 	public static void main(String[] args) {
+		
+		Scanner scanner = null;
+		File f = new File(args[args.length-1]);
 		
 				
 		//can't change these
@@ -47,13 +52,13 @@ public class p1 {
 				System.out.println("Enter '--Outcoordinate' to see output file in coord Based system.");
 				System.out.println("Important: Enter the name of the file containing your map as the last argument");
 				System.out.println("Enter '--Help' for help.");
-				System.exit(-1);
+				//System.exit(-1);
 			} 
 		}
 		
 		if (search != 1) {
 			System.out.println("Error: Please enter ONE of stack, queue, or opt for an approach. Enter '--Help' for help");
-			System.exit(-1);
+			//System.exit(-1);
 		}
 		
 		for (int i = 0; i < args.length; i++) {
@@ -67,8 +72,7 @@ public class p1 {
 		}
 		//***************
 		
-		Scanner scanner = null;
-		File f = new File(args[args.length-1]);
+		
 		
 		try {
 			//code that might throw a special error
@@ -110,9 +114,9 @@ public class p1 {
 									|| line.substring(i, i+1).equals("|")) {
 								map1[currentRow][i] = line.substring(i, i+1);
 							} else { //checking for illegal characters
-								legalInput = false;
-								System.out.println("Error: illegal character");
-								break;
+								//legalInput = false;
+								//System.out.println("Error: illegal character");
+								//break;
 							}
 						}
 					}
@@ -228,8 +232,8 @@ public class p1 {
 				if (symbol.equals(".") || symbol.equals("K")|| symbol.equals("C") || symbol.equals("@") || symbol.equals("|")) {
 					mapCoords[curRow+(currentRoom*rows)][curCol] = symbol;
 				} else {
-					legalInput = false;
-					System.out.println("Error: illegal character");
+					//legalInput = false;
+					//System.out.println("Error: illegal character");
 				}
 				
 			}
@@ -241,11 +245,11 @@ public class p1 {
 				for (int j = 0; j < cols; j++) {
 					//checking for missing coordinates
 					if (mapCoords[i][j] == null) {
-						System.out.println();
-						legalInput = false;
-						complete = false;
-						System.out.println("Error: incomplete map");
-						break;
+						//System.out.println();
+						//legalInput = false;
+						//complete = false;
+						//System.out.println("Error: incomplete map");
+						//break;
 					}
 					if (complete) {
 						//System.out.print(mapCoords[i][j]);
@@ -257,7 +261,7 @@ public class p1 {
 			//System.out.println();
 			
 		} catch(Exception e) {
-			legalInput = false;
+			//legalInput = false;
 			System.out.println("Error: Coordinate does not fit within maze");
 		}
 		
@@ -396,28 +400,7 @@ public class p1 {
 				//System.out.println(curRow + " " + curCol);
 				dequeue.add(curRow);
 				dequeue.add(curCol);
-				if (curRow > (currentRoom-1)*rows) {
-					if (map[curRow-1][curCol].equals("C") || map[curRow-1][curCol].equals("|")) {
-						cakeRow = curRow-1;
-						cakeCol = curCol;
-						break;
-					} else if (map[curRow-1][curCol].equals("1")) {
-						stack.push(curRow-1);
-						stack.push(curCol);
-						map[curRow-1][curCol] = "2";
-					}
-				}
-				if (curRow-((currentRoom-1)*rows) < rows-1) {
-					if (map[curRow+1][curCol].equals("C") || map[curRow+1][curCol].equals("|")) {
-						cakeRow = curRow+1;
-						cakeCol = curCol;
-						break;
-					}else if (map[curRow+1][curCol].equals("1")) {
-						stack.push(curRow+1);
-						stack.push(curCol);
-						map[curRow+1][curCol] = "2";
-					}
-				}
+				
 				if (curCol < cols-1) {
 					if (map[curRow][curCol+1].equals("C") || map[curRow][curCol + 1].equals("|")) {
 						cakeRow = curRow;
@@ -440,6 +423,33 @@ public class p1 {
 						map[curRow][curCol-1] = "2";
 					}
 				}
+				if (curRow-((currentRoom-1)*rows) < rows-1) {
+					if (map[curRow+1][curCol].equals("C") || map[curRow+1][curCol].equals("|")) {
+						cakeRow = curRow+1;
+						cakeCol = curCol;
+						break;
+					}else if (map[curRow+1][curCol].equals("1")) {
+						stack.push(curRow+1);
+						stack.push(curCol);
+						map[curRow+1][curCol] = "2";
+					}
+				}
+				if (curRow > (currentRoom-1)*rows) {
+					if (map[curRow-1][curCol].equals("C") || map[curRow-1][curCol].equals("|")) {
+						cakeRow = curRow-1;
+						cakeCol = curCol;
+						break;
+					} else if (map[curRow-1][curCol].equals("1")) {
+						stack.push(curRow-1);
+						stack.push(curCol);
+						map[curRow-1][curCol] = "2";
+					}
+				}
+				
+			}
+			
+			for (int i = 0; i < dequeue.size()-1; i+=2) {
+				//System.out.println(dequeue.get(i) + " " + dequeue.get(i+1));
 			}
 			
 			//calls optimal path if cake and door exists
@@ -494,13 +504,13 @@ public class p1 {
 			for (int i = 2; i < dequeue.size(); i+=2) {
 				int temp = dequeue.get(i);
 				int temp2 = dequeue.get(i+1);
-				map[temp][temp2] = "+";
+				if (!map[temp][temp2].equals("K")) {
+					map[temp][temp2] = "+";
+				}
 				if (coordBasedOutput) {
 					int roomAdjust = temp / rows;
 					System.out.println("+" + " " + (temp-(roomAdjust*rows)) + " " + temp2);
 				}
-				
-				
 			}
 		} else { //printing that there was no optimal path to the cake
 			System.out.println("The Cake is a Lie, cake exists but no solution");
