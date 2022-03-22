@@ -182,6 +182,10 @@ public class p1 {
 		
 	}
 	
+	public p1() {
+		
+	}
+	
 	public static void coordinateBased(Scanner scan) {
 		
 		try {
