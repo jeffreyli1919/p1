@@ -1,4 +1,3 @@
-import java.awt.print.Printable;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -8,78 +7,70 @@ import java.util.Stack;
 
 public class p1 {
 	
-	static int rows, cols, rooms;
+	private static int rows, cols, rooms;
 	static String[][] mapCoords;
-	static boolean coordBasedInput, coordBasedOutput, queueBased, showRuntime;
-	static Queue<Integer> queue = new LinkedList<>();
-	static Stack<Integer> stack = new Stack<>();
-	static ArrayList<Integer> dequeue = new ArrayList<>();
-	
-	
+	private static boolean coordBasedInput, coordBasedOutput, legalInput, isSolution, queueBased, showRuntime;
+	private static Queue<Integer> queue = new LinkedList<>();
+	private static Stack<Integer> stack = new Stack<>();
+	private static ArrayList<Integer> dequeue = new ArrayList<>();
 	public static void main(String[] args) {
-		
-		Scanner scanner = null;
-		File f = new File(args[args.length-1]);
 		
 				
 		//can't change these
 		coordBasedOutput = false;
 		coordBasedInput = false;
-		//legalInput = true;
-		//isSolution = false;
+		legalInput = true;
+		isSolution = false;
 		showRuntime = false; 
 				
 		
+		//*************Command Line Arguments
+		int search = 0;
+		for (int i = 0; i < args.length; i++) {
+			//System.out.println("Argument " + i  + ": "  + args[i]);
+			if (args[i].equals("--Stack")) {
+				queueBased = false;
+				search++;
+			} else if (args[i].equals("--Queue")) {
+				queueBased = true;
+				search++;
+			} else if (args[i].equals("--Opt")) {
+				queueBased = true;
+				search++;
+			} else if (args[i].equals("--Help")) {
+				System.out.println("Enter commands to help Kirby solve the maze.");
+				System.out.println("Enter '--Stack' to use stack based approach.");
+				System.out.println("Enter '--Queue' to use queue based approach.");
+				System.out.println("Enter '--Opt' to use optimal approach.");
+				System.out.println("Enter '--Time' to see runtime.");
+				System.out.println("Enter '--Incoordinate' if the input file is coord Based.");
+				System.out.println("Enter '--Outcoordinate' to see output file in coord Based system.");
+				System.out.println("Important: Enter the name of the file containing your map as the last argument");
+				System.out.println("Enter '--Help' for help.");
+				System.exit(-1);
+			} 
+		}
+		
+		if (search != 1) {
+			System.out.println("Error: Please enter ONE of stack, queue, or opt for an approach. Enter '--Help' for help");
+			System.exit(-1);
+		}
+		
+		for (int i = 0; i < args.length; i++) {
+			if (args[i].equals("--Time")) {
+				showRuntime = true;
+			} else if (args[i].equals("--Incoordinate")) {
+				coordBasedInput = true;
+			} else if (args[i].equals("--Outcoordinate")) {
+				coordBasedOutput = true;
+			} 
+		}
+		//***************
+		
+		Scanner scanner = null;
+		File f = new File(args[args.length-1]);
+		
 		try {
-			
-			
-			//*************Command Line Arguments
-			int search = 0;
-			for (int i = 0; i < args.length; i++) {
-				//System.out.println("Argument " + i  + ": "  + args[i]);
-				
-				if (args[i].equals("--Incoordinate")) {
-					coordBasedInput = true;
-				} 
-				
-				if (args[i].equals("--Stack")) {
-					queueBased = false;
-					search++;
-				} else if (args[i].equals("--Queue")) {
-					queueBased = true;
-					search++;
-				} else if (args[i].equals("--Opt")) {
-					queueBased = true;
-					search++;
-				} else if (args[i].equals("--Help")) {
-					System.out.println("Enter commands to help Kirby solve the maze.");
-					System.out.println("Enter '--Stack' to use stack based approach.");
-					System.out.println("Enter '--Queue' to use queue based approach.");
-					System.out.println("Enter '--Opt' to use optimal approach.");
-					System.out.println("Enter '--Time' to see runtime.");
-					System.out.println("Enter '--Incoordinate' if the input file is coord Based.");
-					System.out.println("Enter '--Outcoordinate' to see output file in coord Based system.");
-					System.out.println("Important: Enter the name of the file containing your map as the last argument");
-					System.out.println("Enter '--Help' for help.");
-					//System.exit(-1);
-				} 
-			}
-			
-			if (search != 1) {
-				System.out.println("Error: Please enter ONE of stack, queue, or opt for an approach. Enter '--Help' for help");
-				//System.exit(-1);
-			}
-			
-			for (int i = 0; i < args.length; i++) {
-				if (args[i].equals("--Time")) {
-					showRuntime = true;
-				} else if (args[i].equals("--Outcoordinate")) {
-					coordBasedOutput = true;
-				} 
-			}
-			//***************
-			
-			
 			//code that might throw a special error
 			//initializing stuff
 			//map1 is used if regular input
@@ -111,7 +102,7 @@ public class p1 {
 			
 			if (coordBasedInput == false) {
 				//if regular input map fill in map1
-				while (scanner.hasNextLine()) {
+				while (scanner.hasNextLine() && legalInput) {
 					String line = scanner.nextLine();
 					if (currentRow < rows*rooms) {
 						for (int i = 0; i < cols; i++) {
@@ -119,9 +110,9 @@ public class p1 {
 									|| line.substring(i, i+1).equals("|")) {
 								map1[currentRow][i] = line.substring(i, i+1);
 							} else { //checking for illegal characters
-								//legalInput = false;
-								//System.out.println("Error: illegal character");
-								//break;
+								legalInput = false;
+								System.out.println("Error: illegal character");
+								break;
 							}
 						}
 					}
@@ -130,7 +121,7 @@ public class p1 {
 				}
 				
 				//printing original regular input map
-				if (true) {
+				if (legalInput) {
 					for (int i = 0 ; i < map1.length; i++) {
 						for (int j = 0 ; j < map1[0].length; j++) {
 							//System.out.print(map1[i][j]);
@@ -139,9 +130,9 @@ public class p1 {
 					}
 				}
 			}
-			/*
-			//this prints out the coords of a regular based map to make a coord-based input map
-			//of the regular map input
+			
+			/* this prints out the coords of a regular based map to make a coord-based input map
+			 * of the regular map input
 			for (int i = 0; i < rooms; i++) {
 				for (int j = i*rows; j < rows*(i+1); j++) {
 					for (int k = 0; k < map1[0].length; k++) {
@@ -151,11 +142,10 @@ public class p1 {
 			}
 			*/
 			
-			
 			//solution if input is coordinate based
 			if (coordBasedInput) {
 				coordinateBased(scanner);
-				if (true) {
+				if (legalInput) {
 					
 					double time = System.currentTimeMillis();
 					for (int i = 1; i <= rooms; i++) {
@@ -170,7 +160,7 @@ public class p1 {
 			
 			//solution if input is regular
 			if (!coordBasedInput) {
-				if (true) {
+				if (legalInput) {
 					double time = System.currentTimeMillis();
 					for (int i = 1; i <= rooms; i++) {
 						if (queueBased) queueApproach(scanner, map1, i);
@@ -186,8 +176,6 @@ public class p1 {
 		}
 		
 	}
-	
-	
 	
 	public static void coordinateBased(Scanner scan) {
 		
@@ -239,8 +227,8 @@ public class p1 {
 				if (symbol.equals(".") || symbol.equals("K")|| symbol.equals("C") || symbol.equals("@") || symbol.equals("|")) {
 					mapCoords[curRow+(currentRoom*rows)][curCol] = symbol;
 				} else {
-					//legalInput = false;
-					//System.out.println("Error: illegal character");
+					legalInput = false;
+					System.out.println("Error: illegal character");
 				}
 				
 			}
@@ -252,11 +240,11 @@ public class p1 {
 				for (int j = 0; j < cols; j++) {
 					//checking for missing coordinates
 					if (mapCoords[i][j] == null) {
-						//System.out.println();
-						//legalInput = false;
-						//complete = false;
-						//System.out.println("Error: incomplete map");
-						//break;
+						System.out.println();
+						legalInput = false;
+						complete = false;
+						System.out.println("Error: incomplete map");
+						break;
 					}
 					if (complete) {
 						//System.out.print(mapCoords[i][j]);
@@ -268,7 +256,7 @@ public class p1 {
 			//System.out.println();
 			
 		} catch(Exception e) {
-			//legalInput = false;
+			legalInput = false;
 			System.out.println("Error: Coordinate does not fit within maze");
 		}
 		
@@ -288,15 +276,15 @@ public class p1 {
 						queue.add(i);
 						queue.add(j);
 					} else if (map[i][j].equals("|") || map[i][j].equals("C")) {
-						//isSolution = true;
+						isSolution = true;
 						cakeRow = i;
 						cakeCol = j;
 					}
 				}
 			}
 			//if no cake or door is present
-			if (true) {
-				//System.out.println("The Cake is a Lie.");
+			if (isSolution == false) {
+				System.out.println("The Cake is a Lie.");
 			}
 			
 			//adding and removing moves from queue in order of North South East West
@@ -354,11 +342,11 @@ public class p1 {
 			}
 			
 			//finding optimal paths if cake or door exists within the room
-			if (true) {
+			if (isSolution) {
 				findOptimalPath(map, cakeRow, cakeCol);
 			}
 			//printing out the solution map if there is an optimal path within every room
-			if (true) {
+			if (isSolution) {
 				if (currentRoom == rooms) {
 					if (!coordBasedOutput) {
 						printSolution(map);
@@ -388,15 +376,15 @@ public class p1 {
 						stack.push(i);
 						stack.push(j);
 					} else if (map[i][j].equals("|") || map[i][j].equals("C")) {
-						//isSolution = true;
+						isSolution = true;
 						cakeRow = i;
 						cakeCol = j;
 					}
 				}
 			}
 			//if no cake or door present in the room
-			if (true) {
-				//System.out.println("The Cake is a Lie.");
+			if (isSolution == false) {
+				System.out.println("The Cake is a Lie.");
 			}
 			//adding possible moves in north, south, east, west locations of the current spot of Kirby
 			//Kirby's move are kept track in dequeue
@@ -407,7 +395,28 @@ public class p1 {
 				//System.out.println(curRow + " " + curCol);
 				dequeue.add(curRow);
 				dequeue.add(curCol);
-				
+				if (curRow > (currentRoom-1)*rows) {
+					if (map[curRow-1][curCol].equals("C") || map[curRow-1][curCol].equals("|")) {
+						cakeRow = curRow-1;
+						cakeCol = curCol;
+						break;
+					} else if (map[curRow-1][curCol].equals("1")) {
+						stack.push(curRow-1);
+						stack.push(curCol);
+						map[curRow-1][curCol] = "2";
+					}
+				}
+				if (curRow-((currentRoom-1)*rows) < rows-1) {
+					if (map[curRow+1][curCol].equals("C") || map[curRow+1][curCol].equals("|")) {
+						cakeRow = curRow+1;
+						cakeCol = curCol;
+						break;
+					}else if (map[curRow+1][curCol].equals("1")) {
+						stack.push(curRow+1);
+						stack.push(curCol);
+						map[curRow+1][curCol] = "2";
+					}
+				}
 				if (curCol < cols-1) {
 					if (map[curRow][curCol+1].equals("C") || map[curRow][curCol + 1].equals("|")) {
 						cakeRow = curRow;
@@ -430,41 +439,14 @@ public class p1 {
 						map[curRow][curCol-1] = "2";
 					}
 				}
-				if (curRow-((currentRoom-1)*rows) < rows-1) {
-					if (map[curRow+1][curCol].equals("C") || map[curRow+1][curCol].equals("|")) {
-						cakeRow = curRow+1;
-						cakeCol = curCol;
-						break;
-					}else if (map[curRow+1][curCol].equals("1")) {
-						stack.push(curRow+1);
-						stack.push(curCol);
-						map[curRow+1][curCol] = "2";
-					}
-				}
-				if (curRow > (currentRoom-1)*rows) {
-					if (map[curRow-1][curCol].equals("C") || map[curRow-1][curCol].equals("|")) {
-						cakeRow = curRow-1;
-						cakeCol = curCol;
-						break;
-					} else if (map[curRow-1][curCol].equals("1")) {
-						stack.push(curRow-1);
-						stack.push(curCol);
-						map[curRow-1][curCol] = "2";
-					}
-				}
-				
-			}
-			
-			for (int i = 0; i < dequeue.size()-1; i+=2) {
-				//System.out.println(dequeue.get(i) + " " + dequeue.get(i+1));
 			}
 			
 			//calls optimal path if cake and door exists
-			if (true) {
+			if (isSolution) {
 				findOptimalPath(map, cakeRow, cakeCol);
 			}
 			//calls to print solution if every room has an optimal path
-			if (true) {
+			if (isSolution) {
 				if (currentRoom == rooms) {
 					if (!coordBasedOutput) {
 						printSolution(map);
@@ -503,11 +485,11 @@ public class p1 {
 		
 		//checking if solution exists to see whether to continue to printing the solution
 		if (dequeue.size() < 2) {
-			//isSolution = false;
+			isSolution = false;
 		}
 
 		//printing the coordinates of the optimal path
-		if (true) {
+		if (isSolution) {
 			for (int i = 2; i < dequeue.size(); i+=2) {
 				int temp = dequeue.get(i);
 				int temp2 = dequeue.get(i+1);
@@ -558,4 +540,3 @@ public class p1 {
 		
 	}
 }
-
